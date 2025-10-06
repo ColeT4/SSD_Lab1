@@ -7,6 +7,8 @@ namespace SSD_Lab1.Data
 {
     public static class DbInitializer
     {
+        public static string SupervisorPassword;
+        public static string EmployeePassword;
         public static appSecrets appSecrets { get; set; }
         public static async Task<int> SeedUsersAndRolesAsync(IServiceProvider serviceProvider)
         {
@@ -62,8 +64,19 @@ namespace SSD_Lab1.Data
                 EmailConfirmed = true
             };
 
-            var result = await userManager.CreateAsync(supervisor, appSecrets.SupervisorPassword);
-            if (!result.Succeeded) return 1;
+            var result = await userManager.CreateAsync(supervisor, SupervisorPassword);
+
+            if (!result.Succeeded)
+            {
+                Console.WriteLine("supervisor user creation failed:");
+                foreach (var error in result.Errors)
+                    Console.WriteLine($" - {error.Description}");
+                return 1;
+            }
+            else
+            {
+                Console.WriteLine("supervisor user created successfully.");
+            }
 
             result = await userManager.AddToRoleAsync(supervisor, "Supervisor");
             if (!result.Succeeded) return 2;
@@ -79,8 +92,19 @@ namespace SSD_Lab1.Data
                 EmailConfirmed = true
             };
 
-            result = await userManager.CreateAsync(employee, appSecrets.EmployeePassword);
-            if (!result.Succeeded) return 3;
+            result = await userManager.CreateAsync(employee, EmployeePassword);
+
+            if (!result.Succeeded)
+            {
+                Console.WriteLine("Employee user creation failed:");
+                foreach (var error in result.Errors)
+                    Console.WriteLine($" - {error.Description}");
+                return 3;
+            }
+            else
+            {
+                Console.WriteLine("Employee user created successfully.");
+            }
 
             result = await userManager.AddToRoleAsync(employee, "Employee");
             if (!result.Succeeded) return 4;
